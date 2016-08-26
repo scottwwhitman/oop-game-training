@@ -3,112 +3,77 @@ Creator: <Name>
 Location: SF
 -->
 
-![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png)
+#Scott Whitman: Racing Game Model
 
-#Training: Model a Game with OOP
-
-You've learned about OOP, but let's look at how to **incorporate ojbect oriented programming patterns into a web site**.  This document has an example of how we might approach making a card-matching memory game.
+#### Original code repository link: https://github.com/sf-wdi-31/oop-game-training
 
 ### User Stories & Game Mechanics
-1. A user can see a set of face-down cards.
-2. A user can select a card to "flip it over" and see its other side.
-3. If the user flips two matching cards face-up at the same time, the cards will be removed from the game.
-4. If the user flips two non-matching cards face-up at the same time, both cards will turn back face down.
-5. The user wins when they've matched all the cards!
+1. The two players can see the race course.
+2. Each player is asked to enter their name.
+3. Each player is asked to select their car from several choices.
+4. After each player selects their car, the board is set with the two cars at the start line.
+5. The players hit a 'go' button and a '3, 2, 1, Go!' countdown commences.
+6. After "Go!" each player taps a selected key to make their car move.
+7. With each key tap a number randomizer assigns each car with the distance it will move.
+8. A player wins when their car crosses the finish line first at a pre-determined distance.
 
-### Check for Understanding
-
-What are some data structures we might use when building a Memory game?
-
-<details><summary>click to see examples</summary>
-  Did you think of making a `Card` object type? A `Game`?
-</details>
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
 
 ### Data Structures for "Memory" (Independent Practice)
-Let's consider object types Card, Game, and Pair.
 
-Work with a partner to list some properties and methods of cards, the game itself, and a particular pair.
+**CarTypes**
+  - `carType` (Car image)
 
-* List the type of each property (number, boolean, `Card`, etc.).
-* List the parameters that each method will take.
-* Don't forget a constructor!
+**PlayerCar**
+  - `playerName` (string)
+  - `carType` (Car image)
+  - `distanceTraveled` (number)
+  - `moveCar()` (Function - moves car by the randomized distance given with each key stroke)
+  - `createCar(options)` (Function - constructor, creates a car based on player name and carType chosen)
 
-**Card**
-<details><summary>click for examples properties</summary>
-  - `faceImage` (string)
-  - `isFaceUp` (boolean)
-  - `isMatched` (boolean)
-  - `flipOver()` (Function - change whether the card is currently face up)
-  - `Card(options)` (Function - constructor, create a card based on options like whether it should be a random image or what the image should be)
-</details>
-
-**Pair**
-<details><summary>click for examples for Pair</summary>
-  - `card1` (Card)
-  - `card2` (Card)
-  - `addCard(someCard)` (Function - add a specific card to the pair)
-  - `isMatch()` (Function - check if this pair is a match)
-  - `Pair()` (Function - constructor, create an empty pair)
-</details>
+**ScoreBoard**
+  - `Car1` (number)
+  - `Car2` (number)
 
 **Game**
-<details><summary>click for examples for Game</summary>
-  - `current_guess` (Pair)
-  - `cards` ([Card])
-  - `reset()` (Function - resets the game!)
-  - `randomize()` (Function - creates randomized game)
-  - `Game(numCards)` (Function - constructor)
-  - `removeCard(card)` (Function - remove this card from the game)
-  - `hasWon()` (Function - check if the game has been won!)
-  - `celebrate()` (Function - display a win message)
-</details>
+  - `setCars()` (Function - places the two cars in the start position)
+  - `startCountdown()` (Function - timer to start the race and activate the player race keys)
+  - `randomizeDistance()` (Function - random number generator creates randomized distance car can travel with each key stroke)
+  - `playAgain()` (Function - places the two cars back at the start line and sets a new race)
+  - `reset()` (Function - clears the cars and the scores and resets the game!)
+  - `hasWon()` (Function - check if either of the cars has won!)
+  - `celebrate()` (Function - display a win message with the winners name)
+  - `addWinner()` (Function - adds 1 point to the score of the car who won)
+
 
 ### Development Stories
 
-1. A user can see a set of face-down cards.
-  * Create HTML structure to display cards on screen (Handlebars?).
-  * Ensure that cards start out displayed face-down (in `Card` constructor?).
+1. Players can see the race course.
+  * Create HTML structure to display the racecourse.
+  * Need a button to run `createCar` constructor for each player to add `playerName` and select `carType` and adds each car to the page with the `setCars` function.
+  * Activate a click event listener to the start button once both cars have been placed on the race course.
 
-2. A user can select a card to "flip it over" and see its other side.
-  * Add click event listener to cards that:
-     - shows the other side of the card (`flipOver`)
-     - creates or updates a pair (don't add same card twice though!)
-     - checks if the cards in the pair match (`isMatch`)
-     - continues according to result (see 3 and 4, below)
+2. Players hit the start button to initiate the `startCountdown()` function.
+  * Once timer countdown is complete adds keystrokes event listeners to each players designated key that allows players to begin the race
 
-3. If the user flips two matching cards face-up at the same time, the cards will be removed from the game.
-  * Assuming `isMatch()` gave true for the current pair:
-    - set a short timer so the user can see that the cards matched (`setTimeout`), then...
-    - replace each card in the pair with a "blank space" image to let user know it's been removed
-    - use `off` to take off the click event listener from both cards
-    - remove both cards from the game's list of cards
+3. Players begin to tap their designated keys.
+  * Each time a keystroke occurs the `randomizeDistance()` function generates a distance for the corresponding car and adds the distance to `distanceTraveled` and the `moveCar()` function moves the corresponding car the equivalent distance added
+  * After each keystroke the `hasWon()` function checks each cars `distanceTraveled` to see if either car has gone the required distance to win
+  * This process repeats until a car has won
 
-4. If the user flips two non-matching cards face-up at the same time, both cards will turn back face down.
-  * Assuming `isMatch()` gave false for the current pair:
-    - set a short timer so the user can see the cards (`setTimeout`), then...
-    - flip each card in the pair back over so they're face-down
-
-5. The user wins when they've matched all the cards!
-  * Every time there is a match, the Game should also check if its cards array is now empty. (`hasWon`)
-  * If so, show a win screen (`celebrate`)
+4. A car wins when it has gone the required distance to the finish line:
+  * The keystroke event listener for both players keys are turned off and the cars stop
+  * The `celebrate()` function displays the name of the car who won
+  * The `addWinner()` function adds one point to the winning car on the ScoreBoard
+  * A click event listener is turned on for the "Play Again" button, which runs the `playAgain()` function and retains the scores on the ScoreBoard, and then turned off again once the `playAgain()` function is run
+  * The `reset()` function resets the entire game, allowing new players to choose their names and cars
 
 
 ###Potential Challenges / Development Questions
 
-1. How to randomize or shuffle card locations at the beginning of the game?
-2. How to ensure that all the cards have matches?
-3. How to change the image for a card that's face-down, face-up, or matched and removed from game?
-4. Is there a way to hide the identity of a card even from users who know how to use the Chrome dev tools?
-5. Cool card flip animation?!
+1. Giving players custom images
+2. Starting a new race while retaining each players cars and the score board
+3. Building in the random number generator to calculate the distance traveled
+
 
 ### Deliverable
 
@@ -120,5 +85,3 @@ Here are some popular bonus features that would affect your data structure plan:
 2. Can a player type in their name to see custom win messages?
 3. Can you enable a reset button to restart the race?
 4. How about a win counter that spans across multiple races?
-
-As you work, you can edit this README to add a section at the top with your name, a link to the original repository, and a 3-5 sentence reflection on completing this assignment. Push your updates to GitHub and add a link to the repo to the "My Work" section of your website!
